@@ -1,0 +1,24 @@
+{
+  "name": "viesrood/craft-cachekit",
+  "description": "Simple static page caching for Craft CMS 5 with explicit entry invalidation rules.",
+  "type": "craft-plugin",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "viesrood\\cachekit\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "cachekit",
+    "name": "CacheKit",
+    "schemaVersion": "1.0.0",
+    "class": "viesrood\\cachekit\\Plugin",
+    "developer": "Viesrood",
+    "developerUrl": "https://viesrood.nl",
+    "documentationUrl": "https://github.com/viesrood/craft-cachekit"
+  }
+}

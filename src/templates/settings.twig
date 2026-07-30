@@ -1,0 +1,71 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.lightswitchField({
+    label: 'Caching ingeschakeld',
+    instructions: 'Sla geschikte publieke HTML-pagina’s als statische bestanden op.',
+    name: 'cachingEnabled',
+    on: settings.cachingEnabled
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Cachepad',
+    instructions: 'Gebruik in productie bij voorkeur een absolute omgevingsvariabele.',
+    name: 'cachePath',
+    value: settings.cachePath,
+    suggestEnvVars: true,
+    required: true
+}) }}
+
+{% set includedRows = [] %}
+{% for pattern in settings.includedUriPatterns %}
+    {% set includedRows = includedRows|merge([{uriPattern: pattern}]) %}
+{% endfor %}
+{{ forms.editableTableField({
+    label: 'Cachebare URI-patronen',
+    instructions: 'Eén patroon per regel. * mag meerdere padsegmenten omvatten. Gebruik een lege regel niet voor de homepage, maar /.',
+    name: 'includedUriPatterns',
+    cols: {uriPattern: {type: 'singleline', heading: 'URI-patroon'}},
+    rows: includedRows,
+    addRowLabel: 'Patroon toevoegen'
+}) }}
+
+{% set excludedRows = [] %}
+{% for pattern in settings.excludedUriPatterns %}
+    {% set excludedRows = excludedRows|merge([{uriPattern: pattern}]) %}
+{% endfor %}
+{{ forms.editableTableField({
+    label: 'Uitgesloten URI-patronen',
+    instructions: 'Uitsluitingen hebben altijd voorrang.',
+    name: 'excludedUriPatterns',
+    cols: {uriPattern: {type: 'singleline', heading: 'URI-patroon'}},
+    rows: excludedRows,
+    addRowLabel: 'Uitsluiting toevoegen'
+}) }}
+
+{{ forms.editableTableField({
+    label: 'Verversregels per sectie',
+    name: 'sectionRules',
+    cols: {
+        section: {type: 'select', heading: 'Sectie', options: sectionOptions},
+        refreshSelf: {type: 'lightswitch', heading: 'Eigen pagina'},
+        uriPatterns: {type: 'singleline', heading: 'Extra URI’s of wildcards'}
+    },
+    rows: settings.sectionRules,
+    addRowLabel: 'Regel toevoegen'
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Na opslaan opnieuw opwarmen',
+    name: 'warmAfterSave',
+    on: settings.warmAfterSave
+}) }}
+
+{{ forms.textField({
+    label: 'Time-out opwarmrequest',
+    name: 'warmRequestTimeout',
+    value: settings.warmRequestTimeout,
+    type: 'number',
+    min: 1,
+    max: 300,
+    unit: 'seconden'
+}) }}

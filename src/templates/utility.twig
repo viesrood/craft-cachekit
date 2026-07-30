@@ -1,0 +1,43 @@
+{% import "_includes/forms" as forms %}
+
+{% if error %}
+    <div class="readable">
+        <p class="error">{{ error }}</p>
+    </div>
+{% else %}
+    <div class="pane">
+        <p><strong>{{ count }}</strong> gecachte pagina’s</p>
+        <p class="light"><code>{{ path }}</code></p>
+    </div>
+{% endif %}
+
+{% if currentUser.can('cachekit:manage') %}
+    <form method="post" class="utility">
+        {{ csrfInput() }}
+        {{ redirectInput('utilities/cachekit') }}
+        {{ forms.textareaField({
+            label: 'URL’s of patronen',
+            instructions: 'Eén root-relative URL, dezelfde-site absolute URL of wildcard per regel.',
+            id: 'cachekit-targets',
+            name: 'targets',
+            rows: 6,
+            placeholder: '/artikelen/*'
+        }) }}
+        <div class="buttons">
+            <button class="btn" name="action" value="cachekit/cache/clear">Wissen</button>
+            <button class="btn submit" name="action" value="cachekit/cache/refresh">Verversen</button>
+        </div>
+    </form>
+{% endif %}
+
+{% if currentUser.can('cachekit:clearAll') %}
+    <hr>
+    <form method="post" class="utility">
+        {{ csrfInput() }}
+        {{ redirectInput('utilities/cachekit') }}
+        {{ actionInput('cachekit/cache/clear-all') }}
+        <button class="btn formsubmit" data-confirm="Weet je zeker dat je de volledige paginacache wilt legen?">
+            Alles legen
+        </button>
+    </form>
+{% endif %}
