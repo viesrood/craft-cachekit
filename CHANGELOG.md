@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 - 2026-10-23
+
+- The snapshot path error names the web root it checked against and points to
+  `CRAFT_WEB_ROOT`, which the console needs on hosts that do not set it.
+
 ## 1.1.0 - 2026-10-23
 
 - Emergency mode: `cachekit/snapshot/build` writes a complete static copy of

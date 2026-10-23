@@ -107,6 +107,11 @@ CACHEKIT_SNAPSHOT_PATH=/home/site/public_html/cache/cachekit-snapshot
 CACHEKIT_EMERGENCY_FLAG=/home/site/cachekit-emergency
 ```
 
+The console has to know the real web root. If `CRAFT_WEB_ROOT` is not set,
+Craft falls back to `<project>/web` on the command line and the snapshot
+refuses a path that is in fact fine. `cachekit/cache/diagnose` shows this as
+"Binnen @webroot: nee".
+
 Build the snapshot and generate the Apache rules from your settings:
 
 ```bash

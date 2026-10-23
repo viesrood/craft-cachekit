@@ -68,7 +68,12 @@ class SnapshotService
             throw new RuntimeException('Het snapshotpad mag niet gelijk zijn aan het cachepad.');
         }
         if (!$this->isInside($path, $this->getWebroot())) {
-            throw new RuntimeException('Het snapshotpad moet onder de webroot liggen, anders kan Apache er niet bij.');
+            // Zonder CRAFT_WEB_ROOT valt Craft in de console terug op
+            // <basePath>/web, en dan lijkt een goed pad hier fout.
+            throw new RuntimeException(sprintf(
+                'Het snapshotpad moet onder de webroot (%s) liggen, anders kan Apache er niet bij. Klopt die webroot niet, zet dan CRAFT_WEB_ROOT.',
+                $this->getWebroot(),
+            ));
         }
 
         return $path;
