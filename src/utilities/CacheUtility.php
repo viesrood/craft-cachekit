@@ -38,10 +38,15 @@ class CacheUtility extends Utility
             $error = $exception->getMessage();
         }
 
+        $snapshot = Plugin::getInstance()->getSnapshot();
+
         return Craft::$app->getView()->renderTemplate('cachekit/utility', [
             'path' => $path,
             'count' => $count,
             'error' => $error,
+            'snapshotConfigured' => $snapshot->isConfigured(),
+            'snapshotManifest' => $snapshot->getManifest(),
+            'emergencyActive' => $snapshot->isEmergencyActive(),
         ]);
     }
 }

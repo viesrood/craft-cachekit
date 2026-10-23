@@ -27,6 +27,9 @@ class RequestService
             || $request->getIsActionRequest()
             || $request->getIsAjax()
             || $this->hasPublicQueryString($request)
+            // Een template mag zich voor het snapshot anders gedragen (een
+            // formulier uitzetten); die variant hoort nooit in de live cache.
+            || SnapshotService::isSnapshotRequest()
             || Craft::$app->getUser()->getIdentity() !== null
         ) {
             return false;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace viesrood\cachekit\services;
 
 use Craft;
+use craft\elements\Entry;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\models\Site;
@@ -182,6 +183,46 @@ class CacheService
         return false;
     }
 
+    /**
+     * @param array<int, mixed> $patterns
+     */
+    public function matchesAny(string $uri, array $patterns): bool
+    {
+        try {
+            $uri = $this->normalizeUri($uri);
+        } catch (RuntimeException) {
+            return false;
+        }
+
+        foreach ($this->patterns($patterns) as $pattern) {
+            if ($this->matches($uri, $pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * De URI's van alle live entries van een site, gedeeld door het opwarmen
+     * en het snapshot. Alleen de URI's ophalen; volledige elementen laden
+     * loopt op een grote site onnodig het geheugen in.
+     *
+     * @return string[]
+     */
+    public function liveEntryUris(int $siteId): array
+    {
+        $found = Entry::find()
+            ->siteId($siteId)
+            ->status('live')
+            ->uri(':notempty:')
+            ->select(['elements_sites.uri'])
+            ->asArray()
+            ->column();
+
+        return array_values(array_filter($found, 'is_string'));
+    }
+
     public function normalizeTarget(string $target): string
     {
         $target = trim($target);
@@ -269,7 +310,7 @@ class CacheService
         return $result;
     }
 
-    private function sanitizeHost(string $host): string
+    public function sanitizeHost(string $host): string
     {
         return strtolower((string)preg_replace('/[^a-z0-9.-]/i', '', $host));
     }

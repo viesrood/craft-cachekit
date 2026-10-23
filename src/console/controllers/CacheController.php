@@ -6,7 +6,7 @@ namespace viesrood\cachekit\console\controllers;
 
 use Craft;
 use craft\console\Controller;
-use craft\elements\Entry;
+use Throwable;
 use viesrood\cachekit\Plugin;
 use yii\console\ExitCode;
 
@@ -37,19 +37,9 @@ class CacheController extends Controller
     public function actionWarm(): int
     {
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
-            // Alleen de URI's ophalen; volledige elementen laden loopt op een
-            // grote site onnodig het geheugen in.
             $uris = [];
-            $found = Entry::find()
-                ->siteId($site->id)
-                ->status('live')
-                ->uri(':notempty:')
-                ->select(['elements_sites.uri'])
-                ->asArray()
-                ->column();
-
-            foreach ($found as $uri) {
-                if (is_string($uri) && Plugin::getInstance()->getCache()->isCacheableUri($uri)) {
+            foreach (Plugin::getInstance()->getCache()->liveEntryUris((int)$site->id) as $uri) {
+                if (Plugin::getInstance()->getCache()->isCacheableUri($uri)) {
                     $uris[] = $uri;
                 }
             }
@@ -70,6 +60,21 @@ class CacheController extends Controller
         $this->stdout('Schrijfbaar: ' . ((is_dir($path) ? is_writable($path) : is_writable(dirname($path))) ? 'ja' : 'nee') . "\n");
         $this->stdout('Pagina’s: ' . $cache->countAll() . "\n");
         $this->stdout('Caching actief: ' . (Plugin::getInstance()->getSettings()->cachingEnabled ? 'ja' : 'nee') . "\n");
+
+        $snapshot = Plugin::getInstance()->getSnapshot();
+        try {
+            $this->stdout("\nSnapshotpad: {$snapshot->getPath()}\n");
+            $this->stdout("Vlagbestand: {$snapshot->getFlagPath()}\n");
+        } catch (Throwable $exception) {
+            $this->stdout("\nNoodmodus niet ingesteld: {$exception->getMessage()}\n");
+            return ExitCode::OK;
+        }
+        $manifest = $snapshot->getManifest();
+        $this->stdout('Snapshot gebouwd: ' . ($manifest['builtAt'] ?? 'nog nooit') . "\n");
+        if ($manifest !== null) {
+            $this->stdout("Snapshotpagina's: {$manifest['pages']}\n");
+        }
+        $this->stdout('Noodmodus actief: ' . ($snapshot->isEmergencyActive() ? 'JA' : 'nee') . "\n");
         return ExitCode::OK;
     }
 }

@@ -41,3 +41,29 @@
         </button>
     </form>
 {% endif %}
+
+{% if snapshotConfigured %}
+    <hr>
+    <h2>Noodkopie</h2>
+    {% if emergencyActive %}
+        <p class="error">De noodmodus staat aan: bezoekers krijgen de noodkopie te zien.</p>
+    {% endif %}
+    <div class="pane">
+        {% if snapshotManifest %}
+            <p><strong>{{ snapshotManifest.pages }}</strong> pagina’s, gebouwd {{ snapshotManifest.builtAt|datetime('short') }}</p>
+            {% if snapshotManifest.failures|length %}
+                <p class="warning">{{ snapshotManifest.failures|length }} URL’s mislukt bij de laatste build.</p>
+            {% endif %}
+        {% else %}
+            <p class="warning">Er is nog geen noodkopie gebouwd.</p>
+        {% endif %}
+    </div>
+    {% if currentUser.can('cachekit:snapshot') %}
+        <form method="post" class="utility">
+            {{ csrfInput() }}
+            {{ redirectInput('utilities/cachekit') }}
+            {{ actionInput('cachekit/cache/build-snapshot') }}
+            <button class="btn">Noodkopie nu bouwen</button>
+        </form>
+    {% endif %}
+{% endif %}

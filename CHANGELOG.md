@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 - 2026-10-23
+
+- Emergency mode: `cachekit/snapshot/build` writes a complete static copy of
+  the site (entries, extra URIs, sitemaps, the 404 page) and swaps it in
+  atomically, and `cachekit/snapshot/server-config` generates the Apache rules
+  that serve it without PHP while a flag file exists.
+- `craft.cachekit.isSnapshot()` for templates, and the CSRF hydrator skips the
+  token request on snapshot pages.
+- `cachekit/cache/diagnose` and the utility show the snapshot's age and whether
+  emergency mode is active; the utility can queue a new build.
+
 ## 1.0.0 - 2026-07-30
 
 - First release. Static page caching for Craft CMS 5: pages are written to disk

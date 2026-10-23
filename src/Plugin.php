@@ -22,6 +22,7 @@ use viesrood\cachekit\models\Settings;
 use viesrood\cachekit\services\CacheService;
 use viesrood\cachekit\services\InvalidationService;
 use viesrood\cachekit\services\RequestService;
+use viesrood\cachekit\services\SnapshotService;
 use viesrood\cachekit\utilities\CacheUtility;
 use viesrood\cachekit\variables\CacheKitVariable;
 use yii\base\Event;
@@ -30,6 +31,7 @@ use yii\base\Event;
  * @property-read CacheService $cache
  * @property-read InvalidationService $invalidation
  * @property-read RequestService $requestCache
+ * @property-read SnapshotService $snapshot
  */
 class Plugin extends BasePlugin
 {
@@ -44,6 +46,7 @@ class Plugin extends BasePlugin
                 'cache' => CacheService::class,
                 'invalidation' => InvalidationService::class,
                 'requestCache' => RequestService::class,
+                'snapshot' => SnapshotService::class,
             ],
         ];
     }
@@ -82,6 +85,12 @@ class Plugin extends BasePlugin
     {
         /** @var RequestService */
         return $this->get('requestCache');
+    }
+
+    public function getSnapshot(): SnapshotService
+    {
+        /** @var SnapshotService */
+        return $this->get('snapshot');
     }
 
     public function getSettings(): Settings
@@ -161,6 +170,7 @@ class Plugin extends BasePlugin
                 'permissions' => [
                     'cachekit:manage' => ['label' => 'Cache wissen en verversen'],
                     'cachekit:clearAll' => ['label' => 'Volledige cache legen'],
+                    'cachekit:snapshot' => ['label' => 'Noodkopie (snapshot) bouwen'],
                 ],
             ];
         });

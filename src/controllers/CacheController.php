@@ -7,6 +7,8 @@ namespace viesrood\cachekit\controllers;
 use Craft;
 use craft\web\Controller;
 use Throwable;
+use craft\helpers\Queue;
+use viesrood\cachekit\jobs\BuildSnapshotJob;
 use viesrood\cachekit\Plugin;
 use yii\web\Response;
 
@@ -61,6 +63,15 @@ class CacheController extends Controller
         $this->requirePermission('cachekit:clearAll');
         Plugin::getInstance()->getCache()->clearAll();
         Craft::$app->getSession()->setNotice('De volledige CacheKit-cache is geleegd.');
+        return $this->redirectToPostedUrl();
+    }
+
+    public function actionBuildSnapshot(): Response
+    {
+        $this->requirePostRequest();
+        $this->requirePermission('cachekit:snapshot');
+        Queue::push(new BuildSnapshotJob());
+        Craft::$app->getSession()->setNotice('Het bouwen van de noodkopie is ingepland.');
         return $this->redirectToPostedUrl();
     }
 }

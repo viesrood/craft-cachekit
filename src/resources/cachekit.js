@@ -8,6 +8,18 @@
             return;
         }
 
+        // In de noodkopie draait geen PHP: het token ophalen kan niet. Markeer
+        // de formulieren zodat de site ze kan uitschakelen of een melding kan tonen.
+        if (document.querySelector('meta[name="cachekit-snapshot"]')) {
+            fields.forEach(function (field) {
+                if (field.form) {
+                    field.form.setAttribute('data-cachekit-offline', '');
+                }
+            });
+            document.dispatchEvent(new CustomEvent('cachekit:offline'));
+            return;
+        }
+
         try {
             var response = await fetch('/actions/cachekit/csrf/token', {
                 credentials: 'same-origin',

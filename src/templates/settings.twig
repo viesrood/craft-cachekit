@@ -69,3 +69,74 @@
     max: 300,
     unit: 'seconden'
 }) }}
+
+<hr>
+<h2>Noodmodus</h2>
+<p class="light">
+    Een volledige statische kopie van de site die Apache zonder PHP serveert zolang het
+    vlagbestand bestaat. Bouw hem met <code>php craft cachekit/snapshot/build</code> en
+    genereer de .htaccess-regels met <code>php craft cachekit/snapshot/server-config</code>.
+</p>
+
+{{ forms.autosuggestField({
+    label: 'Snapshotpad',
+    instructions: 'Absoluut pad onder de webroot, met "cachekit" in de mapnaam. Niet hetzelfde als het cachepad.',
+    name: 'snapshotPath',
+    value: settings.snapshotPath,
+    suggestEnvVars: true
+}) }}
+
+{{ forms.autosuggestField({
+    label: 'Vlagbestand',
+    instructions: 'Absoluut pad buiten de webroot. Zolang dit bestand bestaat, staat de noodmodus aan.',
+    name: 'emergencyFlagPath',
+    value: settings.emergencyFlagPath,
+    suggestEnvVars: true
+}) }}
+
+{% set extraRows = [] %}
+{% for value in settings.snapshotExtraUris %}
+    {% set extraRows = extraRows|merge([{uriPattern: value.uriPattern ?? value}]) %}
+{% endfor %}
+{% set snapshotRows = [] %}
+{% for value in settings.snapshotIncludeUriPatterns %}
+    {% set snapshotRows = snapshotRows|merge([{uriPattern: value.uriPattern ?? value}]) %}
+{% endfor %}
+{% set blockedRows = [] %}
+{% for value in settings.emergencyBlockedPrefixes %}
+    {% set blockedRows = blockedRows|merge([{uriPattern: value.uriPattern ?? value}]) %}
+{% endfor %}
+
+{{ forms.editableTableField({
+    label: 'Extra URI’s in het snapshot',
+    instructions: 'Routes zonder entry, zoals robots.txt en sitemaps.',
+    name: 'snapshotExtraUris',
+    cols: {uriPattern: {type: 'singleline', heading: 'URI'}},
+    rows: extraRows,
+    addRowLabel: 'URI toevoegen'
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Sitemaps volgen',
+    instructions: 'Neem sub-sitemaps en de pagina’s uit de sitemaps ook op, voor zover de patronen ze toestaan.',
+    name: 'snapshotFollowSitemaps',
+    on: settings.snapshotFollowSitemaps
+}) }}
+
+{{ forms.editableTableField({
+    label: 'Extra patronen voor het snapshot',
+    instructions: 'Uitgesloten van de live cache, maar in de noodmodus wel statisch, zoals een contactpagina.',
+    name: 'snapshotIncludeUriPatterns',
+    cols: {uriPattern: {type: 'singleline', heading: 'URI-patroon'}},
+    rows: snapshotRows,
+    addRowLabel: 'Patroon toevoegen'
+}) }}
+
+{{ forms.editableTableField({
+    label: 'Geblokkeerde padprefixen',
+    instructions: 'Krijgen in de noodmodus een 503. De CP- en action-trigger van Craft horen er altijd automatisch bij.',
+    name: 'emergencyBlockedPrefixes',
+    cols: {uriPattern: {type: 'singleline', heading: 'Prefix'}},
+    rows: blockedRows,
+    addRowLabel: 'Prefix toevoegen'
+}) }}
